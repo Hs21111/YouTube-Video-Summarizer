@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import requests
+import re
 from bs4 import BeautifulSoup
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -17,6 +18,69 @@ st.set_page_config(page_title="YouTube Summarizer & Chat", layout="wide")
 
 # Initialize DB
 database.init_db()
+
+# --- Helpers ---
+def get_video_title(url):
+    try:
+        r = requests.get(url)
+        soup = BeautifulSoup(r.text, 'html.parser')
+        title = soup.title.string.replace(" - YouTube", "")
+        return title
+    except:
+        return "Unknown Video"
+
+def extract_suggestions(text):
+    """
+    Extracts suggested questions from the AI response text.
+    Looks for the **Suggested Questions:** pattern.
+    """
+    suggestions = []
+    if "**Suggested Questions:**" in text:
+        try:
+            # Split by the header
+            part = text.split("**Suggested Questions:**")[1].strip()
+            lines = part.split('\n')
+            for line in lines:
+                # Matches "1. Question..." or "1 Question..."
+                clean_line = line.strip()
+                if clean_line and (clean_line[0].isdigit() and (clean_line[1] == '.' or clean_line[1] == ' ')):
+                    # Remove the number and leading dot/space
+                    q = re.sub(r'^\d+[\.\s]+\s*', '', clean_line)
+                    suggestions.append(q)
+                if len(suggestions) >= 3:
+                    break
+        except Exception:
+            pass
+    return suggestions
+
+def handle_response(user_text, db_id, system_instruction, llm):
+    """
+    Handles generating the AI response, displaying it, and saving to DB.
+    """
+    # Display user message immediately (visual trick, though we rerun)
+    # st.chat_message("user").markdown(user_text) # Optional, sidebar/rerun handles state
+    
+    # Save user message
+    database.add_message(db_id, "user", user_text)
+    
+    # Build Context
+    messages = [SystemMessage(content=system_instruction)]
+    current_history = database.get_chat_history(db_id)
+    for role, content in current_history:
+        if role == "user":
+            messages.append(HumanMessage(content=content))
+        else:
+            messages.append(AIMessage(content=content))
+    
+    # Generate Answer
+    with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
+            response = llm.invoke(messages)
+            st.markdown(response.content)
+    
+    # Save AI message
+    database.add_message(db_id, "ai", response.content)
+    st.rerun()
 
 # --- Sidebar: History ---
 st.sidebar.title("📚 Library")
@@ -37,14 +101,6 @@ for v_id, y_id, v_title in all_videos:
 if "current_video_id" not in st.session_state:
     st.session_state.current_video_id = None
 
-def get_video_title(url):
-    try:
-        r = requests.get(url)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        return soup.title.string.replace(" - YouTube", "")
-    except:
-        return "Unknown Video"
-
 # 1. Input Section
 if st.session_state.current_video_id is None:
     st.markdown("# 📺 YouTube Summarizer & Chat")
@@ -53,18 +109,15 @@ if st.session_state.current_video_id is None:
     url = st.text_input("Enter YouTube Video URL:")
     
     if url:
-        # Extract ID
         vid_id = None
         if "v=" in url:
             vid_id = url.split("v=")[1].split("&")[0]
         elif "youtu.be" in url:
             vid_id = url.split("/")[-1]
         else:
-            vid_id = url # fallback
+            vid_id = url
             
         with st.spinner("Checking library..."):
-            # Check if exists in DB (by youtube_id)
-            # We iterate logic: get_video returns by youtube_id
             existing_vid = database.get_video(vid_id)
         
         if existing_vid:
@@ -83,7 +136,6 @@ if st.session_state.current_video_id is None:
 
 # 2. Chat Section
 else:
-    # Load Video Data
     v_data = database.get_video_by_id(st.session_state.current_video_id)
     if not v_data:
         st.error("Video not found.")
@@ -94,16 +146,13 @@ else:
     
     st.title(f"{title}")
     
-    # Check if we have chat history. If empty, generate summary message first.
     history = database.get_chat_history(db_id)
     
-    # Initialize LLM
     llm = get_model()
     if not llm:
         st.error("API Key not configured.")
         st.stop()
 
-    # System Prompt
     system_instruction = f"""
 You are a helpful assistant.
 Your goal is to answer questions based on the video content provided below.
@@ -123,52 +172,31 @@ Context Data:
 
     # If history is empty, auto-generate summary
     if not history:
-        with st.spinner("Generatng initial summary..."):
-            messages = [
-                SystemMessage(content=system_instruction),
-                HumanMessage(content="Please provide a short summary paragraph of the video content.")
-            ]
-            response = llm.invoke(messages)
-            
-            # Save to DB
-            database.add_message(db_id, "user", "Please provide a short summary paragraph of the video content.")
-            database.add_message(db_id, "ai", response.content)
-            
-            st.rerun()
+        with st.spinner("Generating initial summary..."):
+            # We don't use handle_response regarding reruns here to avoid infinite loops easily, 
+            # but actually it's fine as long as we check history first.
+            handle_response("Please provide a short summary paragraph of the video content.", db_id, system_instruction, llm)
 
     # Display History
     for role, content in history:
-        # Convert role for Streamlit icons
         if role == "user":
             st.chat_message("user").markdown(content)
         else:
             st.chat_message("assistant").markdown(content)
 
+    # Extract Suggestions from Last AI Message
+    last_suggestions = []
+    if history and history[-1][0] == 'ai':
+        last_suggestions = extract_suggestions(history[-1][1])
+
+    # Display Suggestion Buttons (if any)
+    if last_suggestions:
+        st.write("Something specific?")
+        cols = st.columns(len(last_suggestions))
+        for idx, suggestion in enumerate(last_suggestions):
+            if cols[idx].button(suggestion, key=f"sugg_{idx}"):
+                handle_response(suggestion, db_id, system_instruction, llm)
+
     # Chat Input
     if prompt := st.chat_input("Ask a question about the video..."):
-        # Display user message
-        st.chat_message("user").markdown(prompt)
-        
-        # Save user message
-        database.add_message(db_id, "user", prompt)
-        
-        # Build Context for LLM
-        # We rebuild the message list from history + system prompt
-        messages = [SystemMessage(content=system_instruction)]
-        # Add history (limit to last 10 pairs if context is huge, but start simple)
-        # Re-fetching history including the one we just added
-        current_history = database.get_chat_history(db_id)
-        for role, content in current_history:
-            if role == "user":
-                messages.append(HumanMessage(content=content))
-            else:
-                messages.append(AIMessage(content=content))
-        
-        # Generate Answer
-        with st.chat_message("assistant"):
-            with st.spinner("Thinking..."):
-                response = llm.invoke(messages)
-                st.markdown(response.content)
-        
-        # Save AI message
-        database.add_message(db_id, "ai", response.content)
+        handle_response(prompt, db_id, system_instruction, llm)
