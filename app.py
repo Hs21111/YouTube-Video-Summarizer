@@ -19,103 +19,124 @@ st.set_page_config(page_title="YouTube Summarizer & Chat", layout="wide")
 # Initialize DB
 database.init_db()
 
-# --- Neo-Brutalism CSS ---
-st.markdown("""
+# --- Custom Font & Dark Mode CSS ---
+import base64
+def get_img_as_base64(file):
+    with open(file, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+# Try to load local font, else fallback
+try:
+    font_b64 = get_img_as_base64("JetBrainsMono-Regular.woff2")
+    font_face = f"""
+    @font-face {{
+        font-family: 'JetBrainsMono';
+        src: url('data:font/woff2;base64,{font_b64}') format('woff2');
+    }}
+    """
+except Exception:
+    font_face = ""
+
+st.markdown(f"""
 <style>
-    /* Global Font & Colors */
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap');
+    {font_face}
     
-    html, body, [class*="css"] {
-        font-family: 'Space Grotesk', sans-serif;
-        color: #000000;
-        background-color: #f0f0f0; 
-    }
+    /* Global Settings */
+    html, body, [class*="css"] {{
+        font-family: 'JetBrainsMono', monospace !important;
+        background-color: #121212; /* Dark Background */
+        color: #ffffff;
+    }}
 
     /* Main Container */
-    .stApp {
-        background-color: #e0e7ff; /* Light indigo bg */
-    }
+    .stApp {{
+        background-color: #121212;
+    }}
 
     /* Sidebar */
-    [data-testid="stSidebar"] {
-        background-color: #ffde7d; /* Neo-brutalist Yellow */
-        border-right: 4px solid #000000;
-    }
-    [data-testid="stSidebar"] .stButton > button {
-        background-color: #ffffff;
-        color: #000000;
-        border: 3px solid #000000;
-        box-shadow: 4px 4px 0px 0px #000000;
+    [data-testid="stSidebar"] {{
+        background-color: #1e1e1e;
+        border-right: 3px solid #ffffff;
+    }}
+    
+    /* Sidebar Headers */
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {{
+        color: #ff00ff !important; /* Neon Magenta */
+        text-shadow: 2px 2px 0px #ffffff;
+        -webkit-text-stroke: 0px;
+    }}
+
+    /* Sidebar Buttons (History) */
+    [data-testid="stSidebar"] .stButton > button {{
+        background-color: #2d2d2d;
+        color: #ffffff;
+        border: 2px solid #ffffff;
+        box-shadow: 4px 4px 0px 0px #00ff00; /* Neon Green Shadow */
         transition: all 0.1s;
         font-weight: bold;
-        width: 100%;
-    }
-    [data-testid="stSidebar"] .stButton > button:hover {
+        text-transform: uppercase;
+    }}
+    [data-testid="stSidebar"] .stButton > button:hover {{
         transform: translate(-2px, -2px);
-        box-shadow: 6px 6px 0px 0px #000000;
-    }
-    [data-testid="stSidebar"] .stButton > button:active {
-        transform: translate(2px, 2px);
-        box-shadow: 2px 2px 0px 0px #000000;
-    }
+        box-shadow: 6px 6px 0px 0px #00ff00;
+        background-color: #000000;
+        color: #00ff00;
+    }}
 
-    /* Main Buttons (Suggested Questions) */
-    .stButton > button {
-        background-color: #a78bfa; /* Violet */
-        color: #000000;
-        border: 3px solid #000000;
-        box-shadow: 4px 4px 0px 0px #000000;
-        border-radius: 0px;
-        font-weight: bold;
-    }
-    .stButton > button:hover {
-        background-color: #c4b5fd;
-        border: 3px solid #000000;
-        box-shadow: 6px 6px 0px 0px #000000;
-        color: #000000;
-    }
+    /* Main Headings */
+    h1, h2, h3 {{
+        font-weight: 800;
+        color: #fff;
+        text-transform: uppercase;
+        text-shadow: 4px 4px 0px #0000ff; /* Neon Blue Shadow */
+    }}
     
-    /* Inputs */
-    .stTextInput > div > div > input {
-        border: 3px solid #000000;
-        box-shadow: 4px 4px 0px 0px #000000;
+    /* Input Fields */
+    .stTextInput > div > div > input {{
+        background-color: #000000;
+        color: #00ff00; /* Hacker Green Text */
+        border: 2px solid #ffffff;
+        box-shadow: 5px 5px 0px 0px #ffffff;
         border-radius: 0px;
-        color: #000000;
-        background-color: #ffffff;
-    }
-    .stChatInputContainer textarea {
-        border: 3px solid #000000 !important;
-        box-shadow: 4px 4px 0px 0px #000000 !important;
+    }}
+    .stChatInputContainer textarea {{
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border: 2px solid #ffffff !important;
+        box-shadow: 5px 5px 0px 0px #ffffff !important;
         border-radius: 0px !important;
-        background-color: #ffffff !important;
-        color: #000000 !important;
-    }
+    }}
 
     /* Chat Messages */
-    .stChatMessage {
-        border: 3px solid #000000;
-        box-shadow: 5px 5px 0px 0px #000000;
+    .stChatMessage {{
+        background-color: #1e1e1e;
+        border: 2px solid #ffffff;
+        box-shadow: 5px 5px 0px 0px #ff00ff; /* Magenta Shadow */
         border-radius: 0px;
-        padding: 10px;
+        margin-bottom: 15px;
+    }}
+    
+    /* Suggested Question Buttons */
+    .stButton > button {{
+        background-color: #000000;
+        color: #00ffff; /* Cyan Text */
+        border: 2px solid #ffffff;
+        box-shadow: 4px 4px 0px 0px #ffffff;
+        border-radius: 0px;
+        font-weight: bold;
+    }}
+    .stButton > button:hover {{
         background-color: #ffffff;
-        margin-bottom: 10px;
-    }
-    [data-testid="stChatMessageAvatarUser"] {
-        filter: drop-shadow(2px 2px 0px #000);
-        background-color: #feb2b2; /* Light Red */
-    }
-    [data-testid="stChatMessageAvatarAssistant"] {
-        filter: drop-shadow(2px 2px 0px #000);
-        background-color: #90cdf4; /* Light Blue */
-    }
+        color: #000000;
+        box-shadow: 6px 6px 0px 0px #00ffff;
+        border: 2px solid #000000;
+    }}
 
-    /* Headings */
-    h1, h2, h3 {
-        text-transform: uppercase;
-        font-weight: 800;
-        text-shadow: 3px 3px 0px #fff;
-        -webkit-text-stroke: 1px black;
-    }
+    /* Spinners/Status */
+    .stSpinner > div {{
+        border-top-color: #00ff00 !important;
+    }}
 
 </style>
 """, unsafe_allow_html=True)
