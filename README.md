@@ -46,7 +46,7 @@ A Python tool that fetches YouTube video transcripts and uses Google's Gemini 3 
     *Type `exit` or `quit` to end the session.*
 
 ## Features
-- **Smart Summarization**: Uses `gemini-1.5-pro` (or configured model) for high-quality summaries.
+- **Smart Summarization**: Uses `gemini-2.5-pro` for high-quality summaries.
 - **Interactive Chat**: Ask questions about the video content with context retention.
 - **Auto-Suggestions**: Get 3 relevant follow-up questions after every answer.
 - **Rich TUI**: Beautiful terminal interface with markdown rendering.
