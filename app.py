@@ -51,7 +51,10 @@ st.markdown(f"""
         --bg: #050505;
         --card-bg: #101010;
         --text: #ffffff;
-        --border: 2px solid #ffffff;
+        --border: 3px solid #ffffff;
+        --shadow-size: 8px;
+        --hover-lift: -4px;
+        --hover-shadow: 12px;
     }}
 
     /* Global Settings */
@@ -77,10 +80,11 @@ st.markdown(f"""
         font-weight: 800;
         color: var(--text);
         text-transform: uppercase;
-        border-bottom: 4px solid var(--accent);
+        border-bottom: 6px solid var(--accent);
         display: inline-block;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         padding-bottom: 5px;
+        text-shadow: 3px 3px 0px var(--accent);
     }}
 
     /* Sidebar Buttons (History) */
@@ -88,18 +92,23 @@ st.markdown(f"""
         background-color: var(--bg);
         color: var(--text);
         border: var(--border);
-        box-shadow: 4px 4px 0px 0px var(--accent);
-        transition: all 0.1s;
+        box-shadow: var(--shadow-size) var(--shadow-size) 0px 0px var(--accent);
+        transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         font-weight: bold;
         text-transform: uppercase;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
+        letter-spacing: 1px;
     }}
     [data-testid="stSidebar"] .stButton > button:hover {{
-        transform: translate(-2px, -2px);
-        box-shadow: 6px 6px 0px 0px var(--accent);
+        transform: translate(var(--hover-lift), var(--hover-lift));
+        box-shadow: var(--hover-shadow) var(--hover-shadow) 0px 0px var(--accent);
         background-color: var(--accent);
         color: #000000;
-        border: 2px solid var(--accent);
+        border: 3px solid var(--accent);
+    }}
+    [data-testid="stSidebar"] .stButton > button:active {{
+        transform: translate(0px, 0px);
+        box-shadow: 0px 0px 0px 0px var(--accent);
     }}
     
     /* Input Fields */
@@ -107,25 +116,42 @@ st.markdown(f"""
         background-color: var(--card-bg);
         color: var(--accent);
         border: var(--border);
-        box-shadow: 4px 4px 0px 0px var(--text);
+        box-shadow: var(--shadow-size) var(--shadow-size) 0px 0px var(--text);
         border-radius: 0px;
         caret-color: var(--accent);
+        transition: all 0.2s;
     }}
+    .stTextInput > div > div > input:focus {{
+        transform: translate(-2px, -2px);
+        box-shadow: 10px 10px 0px 0px var(--text);
+        outline: none;
+    }}
+
     .stChatInputContainer textarea {{
         background-color: var(--card-bg) !important;
         color: var(--text) !important;
         border: var(--border) !important;
-        box-shadow: 4px 4px 0px 0px var(--text) !important;
+        box-shadow: var(--shadow-size) var(--shadow-size) 0px 0px var(--text) !important;
         border-radius: 0px !important;
+        transition: all 0.2s;
+    }}
+    .stChatInputContainer textarea:focus {{
+        transform: translate(-2px, -2px);
+        box-shadow: 10px 10px 0px 0px var(--text) !important;
     }}
 
     /* Chat Messages */
     .stChatMessage {{
         background-color: var(--card-bg);
         border: var(--border);
-        box-shadow: 6px 6px 0px 0px var(--accent);
+        box-shadow: var(--shadow-size) var(--shadow-size) 0px 0px var(--accent);
         border-radius: 0px;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
+        transition: transform 0.2s;
+    }}
+    .stChatMessage:hover {{
+        transform: translate(-2px, -2px);
+        box-shadow: 10px 10px 0px 0px var(--accent);
     }}
     
     /* Suggested Question Buttons */
@@ -133,15 +159,21 @@ st.markdown(f"""
         background-color: var(--bg);
         color: var(--accent);
         border: var(--border);
-        box-shadow: 4px 4px 0px 0px var(--text);
+        box-shadow: var(--shadow-size) var(--shadow-size) 0px 0px var(--text);
         border-radius: 0px;
         font-weight: bold;
+        transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }}
     .stButton > button:hover {{
         background-color: var(--text);
         color: #000000;
-        box-shadow: 6px 6px 0px 0px var(--accent);
-        border: 2px solid var(--text);
+        transform: translate(var(--hover-lift), var(--hover-lift));
+        box-shadow: var(--hover-shadow) var(--hover-shadow) 0px 0px var(--accent);
+        border: 3px solid var(--text);
+    }}
+    .stButton > button:active {{
+        transform: translate(0px, 0px);
+        box-shadow: 0px 0px 0px 0px var(--accent);
     }}
 
     /* Spinners/Status */
@@ -154,6 +186,12 @@ st.markdown(f"""
         border: var(--border);
         border-radius: 0px;
         height: 40px;
+        box-shadow: 4px 4px 0px 0px var(--text);
+        cursor: pointer;
+    }}
+    input[type="color"]:hover {{
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0px 0px var(--text);
     }}
 
 </style>
