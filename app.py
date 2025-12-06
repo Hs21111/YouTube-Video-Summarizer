@@ -33,6 +33,8 @@ try:
     @font-face {{
         font-family: 'JetBrainsMono';
         src: url('data:font/woff2;base64,{font_b64}') format('woff2');
+        font-weight: normal;
+        font-style: normal;
     }}
     """
 except Exception:
@@ -57,16 +59,15 @@ st.markdown(f"""
         --hover-shadow: 12px;
     }}
 
-    /* Global Settings */
-    html, body, [class*="css"] {{
+    /* FORCE GLOBAL FONT */
+    html, body, [class*="css"], font, span, div, p, h1, h2, h3, h4, h5, h6, input, textarea, button {{
         font-family: 'JetBrainsMono', monospace !important;
-        background-color: var(--bg);
-        color: var(--text);
     }}
-
-    /* Main Container */
+    
+    /* Backgrounds */
     .stApp {{
         background-color: var(--bg);
+        color: var(--text);
     }}
 
     /* Sidebar */
@@ -74,8 +75,11 @@ st.markdown(f"""
         background-color: var(--card-bg);
         border-right: var(--border);
     }}
+    [data-testid="stSidebar"] * {{
+        color: var(--text) !important;
+    }}
     
-    /* Headings with Accent Underline */
+    /* Headings: Clean Text, Accent Underline Only */
     h1, h2, h3 {{
         font-weight: 800;
         color: var(--text);
@@ -84,7 +88,7 @@ st.markdown(f"""
         display: inline-block;
         margin-bottom: 25px;
         padding-bottom: 5px;
-        text-shadow: 3px 3px 0px var(--accent);
+        text-shadow: none !important; /* REMOVED TEXT SHADOW */
     }}
 
     /* Sidebar Buttons (History) */
@@ -103,7 +107,7 @@ st.markdown(f"""
         transform: translate(var(--hover-lift), var(--hover-lift));
         box-shadow: var(--hover-shadow) var(--hover-shadow) 0px 0px var(--accent);
         background-color: var(--accent);
-        color: #000000;
+        color: #000000 !important; /* Black text on accent bg */
         border: 3px solid var(--accent);
     }}
     [data-testid="stSidebar"] .stButton > button:active {{
@@ -166,7 +170,7 @@ st.markdown(f"""
     }}
     .stButton > button:hover {{
         background-color: var(--text);
-        color: #000000;
+        color: #000000 !important;
         transform: translate(var(--hover-lift), var(--hover-lift));
         box-shadow: var(--hover-shadow) var(--hover-shadow) 0px 0px var(--accent);
         border: 3px solid var(--text);
