@@ -1,16 +1,21 @@
 import os
-import argparse
 import getpass
 from dotenv import load_dotenv
 from youtube_transcript_api import YouTubeTranscriptApi
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.prompts import PromptTemplate
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+from rich.console import Console
+from rich.markdown import Markdown
+from rich.panel import Panel
+from rich.prompt import Prompt
 
 # Load environment variables from .env file
 load_dotenv()
 
-# Set model to Gemini 3.0 Pro Preview as requested
-MODEL_NAME = "gemini-3-pro-preview"
+# Set model
+MODEL_NAME = "gemini-1.5-pro" # Using safe default, user can change if needed
+
+console = Console()
 
 def get_transcript(video_url):
     """
@@ -23,81 +28,101 @@ def get_transcript(video_url):
         elif "youtu.be" in video_url:
              video_id = video_url.split("/")[-1]
         else:
-             # Assume it's an ID if not a url, or standard ID length
              video_id = video_url
     except Exception:
-        print("Error: Could not extract video ID.")
+        console.print("[bold red]Error:[/bold red] Could not extract video ID.")
         return None
 
     try:
-        # instantiate the API class
         api = YouTubeTranscriptApi()
-        # use fetch which returns the transcript list directly
         transcript_list = api.fetch(video_id)
         transcript_text = " ".join([i.text for i in transcript_list])
         return transcript_text
     except Exception as e:
-        print(f"Error retrieving transcript: {e}")
-        return None
-
-def summarize_video(transcript_text):
-    """
-    Summarizes the transcript using Gemini.
-    """
-    api_key = os.environ.get("GOOGLE_API_KEY")
-    if not api_key:
-        print("GOOGLE_API_KEY not found in environment.")
-        try:
-            api_key = getpass.getpass("Enter your GOOGLE_API_KEY: ")
-            os.environ["GOOGLE_API_KEY"] = api_key # key is set for this session
-        except Exception as e:
-            print(f"Error getting API key: {e}")
-            return None
-
-    if not api_key:
-        print("Error: No API key provided.")
-        return None
-
-    llm = ChatGoogleGenerativeAI(model=MODEL_NAME, temperature=0.7)
-    
-    template = """
-    You are a helpful assistant.
-    Read the following YouTube video transcript and generate a concise 3-bullet point summary.
-    
-    Transcript:
-    {transcript}
-    
-    Summary:
-    """
-    
-    prompt = PromptTemplate(template=template, input_variables=["transcript"])
-    chain = prompt | llm
-    
-    try:
-        response = chain.invoke({"transcript": transcript_text})
-        return response.content
-    except Exception as e:
-        print(f"Error generating summary: {e}")
+        console.print(f"[bold red]Error retrieving transcript:[/bold red] {e}")
         return None
 
 def main():
-    parser = argparse.ArgumentParser(description="YouTube Video Summarizer")
-    parser.add_argument("url", help="URL of the YouTube video")
-    args = parser.parse_args()
+    console.print(Panel.fit("[bold blue]YouTube Video Summarizer & Chat[/bold blue]", border_style="blue"))
 
-    print(f"Fetching transcript for: {args.url}")
-    transcript = get_transcript(args.url)
+    # API Key Handling
+    api_key = os.environ.get("GOOGLE_API_KEY")
+    if not api_key:
+        console.print("[yellow]GOOGLE_API_KEY not found in environment.[/yellow]")
+        try:
+            api_key = getpass.getpass("Enter your GOOGLE_API_KEY: ")
+            os.environ["GOOGLE_API_KEY"] = api_key
+        except Exception as e:
+            console.print(f"[bold red]Error getting API key:[/bold red] {e}")
+            return
+
+    if not api_key:
+        console.print("[bold red]Error:[/bold red] No API key provided. Exiting.")
+        return
+
+    # User Input for URL
+    video_url = Prompt.ask("[bold green]Enter YouTube Video URL[/bold green]")
     
-    if transcript:
-        print("Transcript fetched. Generating summary...")
-        summary = summarize_video(transcript)
-        if summary:
-            print("\nSummary:")
-            print(summary)
-        else:
-            print("Failed to generate summary.")
-    else:
-        print("Failed to fetch transcript.")
+    with console.status("[bold green]Fetching transcript...[/bold green]", spinner="dots"):
+        transcript = get_transcript(video_url)
+
+    if not transcript:
+        return
+
+    console.print("[bold green]Transcript fetched successfully![/bold green]")
+
+    # Initialize LLM
+    llm = ChatGoogleGenerativeAI(model=MODEL_NAME, temperature=0.7)
+
+    # Chat Loop with Memory
+    # We maintain a simple list of messages
+    messages = [
+        SystemMessage(content=f"""
+You are a helpful assistant.
+Your goal is to answer questions based on the following YouTube video transcript.
+After answering the user's question, you MUST provide 3 short "Next Question" suggestions relevant to the context.
+Format the suggestions clearly at the end of your response like this:
+
+**Suggested Questions:**
+1. ...
+2. ...
+3. ...
+
+Transcript:
+{transcript}
+""")
+    ]
+
+    # Initial Summary Request (simulated as the first user "trigger")
+    initial_trigger = "Please provide a concise 3-bullet point summary of this video."
+    messages.append(HumanMessage(content=initial_trigger))
+
+    console.print(Panel("[bold yellow]Generating Summary...[/bold yellow]", border_style="yellow"))
+    
+    while True:
+        try:
+            with console.status("[bold blue]Thinking...[/bold blue]", spinner="dots"):
+                response = llm.invoke(messages)
+            
+            # Display Response
+            console.print(Markdown(response.content))
+            console.print("-" * 50)
+            
+            # Add response to memory
+            messages.append(AIMessage(content=response.content))
+
+            # Next User Input
+            user_input = Prompt.ask("[bold cyan]You (or type 'exit')[/bold cyan]")
+            
+            if user_input.lower() in ["exit", "quit", "q"]:
+                console.print("[bold green]Goodbye![/bold green]")
+                break
+            
+            messages.append(HumanMessage(content=user_input))
+
+        except Exception as e:
+            console.print(f"[bold red]Error encountered:[/bold red] {e}")
+            break
 
 if __name__ == "__main__":
     main()

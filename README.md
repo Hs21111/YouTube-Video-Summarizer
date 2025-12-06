@@ -26,26 +26,29 @@ A Python tool that fetches YouTube video transcripts and uses Google's Gemini 3 
     ```
 
 ## Usage
-
 1.  **Set your API Key** (Optional but recommended):
     Create a `.env` file in the root directory:
     ```env
     GOOGLE_API_KEY=your_actual_api_key_here
     ```
 
-2.  **Run the summarizer**:
+2.  **Run the interactive tool**:
     ```bash
-    uv run main.py <youtube_url>
+    uv run main.py
     ```
 
-    Example:
-    ```bash
-    uv run main.py https://www.youtube.com/watch?v=jNQXAC9IVRw
-    ```
+3.  **Interact**:
+    - Paste the YouTube URL when prompted.
+    - View the summary.
+    - Ask follow-up questions in the chat interface.
+    - See "Suggested Questions" to explore the video further.
 
-    *If you haven't set the API key, the script will prompt you for it securely.*
+    *Type `exit` or `quit` to end the session.*
 
-## Requirements
-- Python 3.12+
-- `uv` package manager
-- A Google Cloud API key with access to Gemini API.
+## Features
+- **Smart Summarization**: Uses `gemini-1.5-pro` (or configured model) for high-quality summaries.
+- **Interactive Chat**: Ask questions about the video content with context retention.
+- **Auto-Suggestions**: Get 3 relevant follow-up questions after every answer.
+- **Rich TUI**: Beautiful terminal interface with markdown rendering.
+- **Transcript Fetching**: robustly handles video URLs and IDs.
+- **Secure Authentication**: Supports `.env` and secure prompts.
