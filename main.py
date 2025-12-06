@@ -94,7 +94,7 @@ Transcript:
     ]
 
     # Initial Summary Request (simulated as the first user "trigger")
-    initial_trigger = "Please provide a concise 3-bullet point summary of this video."
+    initial_trigger = "Please provide a short summary paragraph of this video."
     messages.append(HumanMessage(content=initial_trigger))
 
     console.print(Panel("[bold yellow]Generating Summary...[/bold yellow]", border_style="yellow"))

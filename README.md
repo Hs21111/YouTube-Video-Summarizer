@@ -1,6 +1,6 @@
 # YouTube Video Summarizer
 
-A Python tool that fetches YouTube video transcripts and uses Google's Gemini 2.5 Pro (via LangChain) to generate concise bullet-point summaries.
+A Python tool that fetches YouTube video transcripts and uses Google's Gemini 2.5 Pro (via LangChain) to generate a short summary paragraph.
 
 ## Features
 - **Smart Summarization**: Uses `gemini-2.5-pro` for high-quality summaries.
