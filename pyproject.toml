@@ -5,9 +5,12 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
+    "beautifulsoup4>=4.14.3",
     "langchain>=1.1.2",
     "langchain-google-genai>=3.2.0",
     "python-dotenv>=1.2.1",
+    "requests>=2.32.5",
     "rich>=14.2.0",
+    "streamlit>=1.52.1",
     "youtube-transcript-api>=1.2.3",
 ]

@@ -17,6 +17,14 @@ MODEL_NAME = "gemini-2.5-pro" # Verified available via API
 
 console = Console()
 
+def get_model():
+    """Returns the configured ChatGoogleGenerativeAI instance."""
+    api_key = os.environ.get("GOOGLE_API_KEY")
+    if not api_key:
+        return None
+    return ChatGoogleGenerativeAI(model=MODEL_NAME, temperature=0.7)
+
+
 def get_transcript(video_url):
     """
     Retrieves the transcript of a YouTube video given its URL.

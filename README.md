@@ -45,10 +45,20 @@ A Python tool that fetches YouTube video transcripts and uses Google's Gemini 2.
 
     *Type `exit` or `quit` to end the session.*
 
+### Web Interface (Streamlit)
+For a visual interface with persistent history:
+```bash
+uv run streamlit run app.py
+```
+- **Library Sidebar**: Access past video chats.
+- **Rich Chat**: Chat bubble interface.
+- **Persistence**: automatically saves chat history to a local SQLite database.
+
 ## Features
 - **Smart Summarization**: Uses `gemini-2.5-pro` for high-quality summaries.
-- **Interactive Chat**: Ask questions about the video content with context retention.
+- **Web GUI**: Full-featured web chat with history sidebar.
+- **Interactive TUI**: Beautiful terminal interface.
+- **Persistent Memory**: Remembers your chats per video in `chat_history.db`.
 - **Auto-Suggestions**: Get 3 relevant follow-up questions after every answer.
-- **Rich TUI**: Beautiful terminal interface with markdown rendering.
 - **Transcript Fetching**: robustly handles video URLs and IDs.
 - **Secure Authentication**: Supports `.env` and secure prompts.
