@@ -79,7 +79,9 @@ def main():
     messages = [
         SystemMessage(content=f"""
 You are a helpful assistant.
-Your goal is to answer questions based on the following YouTube video transcript.
+Your goal is to answer questions based on the video content provided below.
+CRITICAL INSTRUCTION: Do NOT mention "the transcript", "the text", or "according to the video" in your responses. 
+Act as if you just watched the video and know the information naturally.
 After answering the user's question, you MUST provide 3 short "Next Question" suggestions relevant to the context.
 Format the suggestions clearly at the end of your response like this:
 
@@ -88,13 +90,13 @@ Format the suggestions clearly at the end of your response like this:
 2. ...
 3. ...
 
-Transcript:
+Context Data:
 {transcript}
 """)
     ]
 
     # Initial Summary Request (simulated as the first user "trigger")
-    initial_trigger = "Please provide a short summary paragraph of this video."
+    initial_trigger = "Please provide a short summary paragraph of the video content."
     messages.append(HumanMessage(content=initial_trigger))
 
     console.print(Panel("[bold yellow]Generating Summary...[/bold yellow]", border_style="yellow"))
