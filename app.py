@@ -38,104 +38,122 @@ try:
 except Exception:
     font_face = ""
 
+# --- Sidebar Configuration ---
+st.sidebar.title("⚙️ CONFIG")
+accent_color = st.sidebar.color_picker("Accent Color", "#00ff00") # Default Neon Green
+
 st.markdown(f"""
 <style>
     {font_face}
     
+    :root {{
+        --accent: {accent_color};
+        --bg: #050505;
+        --card-bg: #101010;
+        --text: #ffffff;
+        --border: 2px solid #ffffff;
+    }}
+
     /* Global Settings */
     html, body, [class*="css"] {{
         font-family: 'JetBrainsMono', monospace !important;
-        background-color: #121212; /* Dark Background */
-        color: #ffffff;
+        background-color: var(--bg);
+        color: var(--text);
     }}
 
     /* Main Container */
     .stApp {{
-        background-color: #121212;
+        background-color: var(--bg);
     }}
 
     /* Sidebar */
     [data-testid="stSidebar"] {{
-        background-color: #1e1e1e;
-        border-right: 3px solid #ffffff;
+        background-color: var(--card-bg);
+        border-right: var(--border);
     }}
     
-    /* Sidebar Headers */
-    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {{
-        color: #ff00ff !important; /* Neon Magenta */
-        text-shadow: 2px 2px 0px #ffffff;
-        -webkit-text-stroke: 0px;
+    /* Headings with Accent Underline */
+    h1, h2, h3 {{
+        font-weight: 800;
+        color: var(--text);
+        text-transform: uppercase;
+        border-bottom: 4px solid var(--accent);
+        display: inline-block;
+        margin-bottom: 20px;
+        padding-bottom: 5px;
     }}
 
     /* Sidebar Buttons (History) */
     [data-testid="stSidebar"] .stButton > button {{
-        background-color: #2d2d2d;
-        color: #ffffff;
-        border: 2px solid #ffffff;
-        box-shadow: 4px 4px 0px 0px #00ff00; /* Neon Green Shadow */
+        background-color: var(--bg);
+        color: var(--text);
+        border: var(--border);
+        box-shadow: 4px 4px 0px 0px var(--accent);
         transition: all 0.1s;
         font-weight: bold;
         text-transform: uppercase;
+        margin-bottom: 10px;
     }}
     [data-testid="stSidebar"] .stButton > button:hover {{
         transform: translate(-2px, -2px);
-        box-shadow: 6px 6px 0px 0px #00ff00;
-        background-color: #000000;
-        color: #00ff00;
-    }}
-
-    /* Main Headings */
-    h1, h2, h3 {{
-        font-weight: 800;
-        color: #fff;
-        text-transform: uppercase;
-        text-shadow: 4px 4px 0px #0000ff; /* Neon Blue Shadow */
+        box-shadow: 6px 6px 0px 0px var(--accent);
+        background-color: var(--accent);
+        color: #000000;
+        border: 2px solid var(--accent);
     }}
     
     /* Input Fields */
     .stTextInput > div > div > input {{
-        background-color: #000000;
-        color: #00ff00; /* Hacker Green Text */
-        border: 2px solid #ffffff;
-        box-shadow: 5px 5px 0px 0px #ffffff;
+        background-color: var(--card-bg);
+        color: var(--accent);
+        border: var(--border);
+        box-shadow: 4px 4px 0px 0px var(--text);
         border-radius: 0px;
+        caret-color: var(--accent);
     }}
     .stChatInputContainer textarea {{
-        background-color: #000000 !important;
-        color: #ffffff !important;
-        border: 2px solid #ffffff !important;
-        box-shadow: 5px 5px 0px 0px #ffffff !important;
+        background-color: var(--card-bg) !important;
+        color: var(--text) !important;
+        border: var(--border) !important;
+        box-shadow: 4px 4px 0px 0px var(--text) !important;
         border-radius: 0px !important;
     }}
 
     /* Chat Messages */
     .stChatMessage {{
-        background-color: #1e1e1e;
-        border: 2px solid #ffffff;
-        box-shadow: 5px 5px 0px 0px #ff00ff; /* Magenta Shadow */
+        background-color: var(--card-bg);
+        border: var(--border);
+        box-shadow: 6px 6px 0px 0px var(--accent);
         border-radius: 0px;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }}
     
     /* Suggested Question Buttons */
     .stButton > button {{
-        background-color: #000000;
-        color: #00ffff; /* Cyan Text */
-        border: 2px solid #ffffff;
-        box-shadow: 4px 4px 0px 0px #ffffff;
+        background-color: var(--bg);
+        color: var(--accent);
+        border: var(--border);
+        box-shadow: 4px 4px 0px 0px var(--text);
         border-radius: 0px;
         font-weight: bold;
     }}
     .stButton > button:hover {{
-        background-color: #ffffff;
+        background-color: var(--text);
         color: #000000;
-        box-shadow: 6px 6px 0px 0px #00ffff;
-        border: 2px solid #000000;
+        box-shadow: 6px 6px 0px 0px var(--accent);
+        border: 2px solid var(--text);
     }}
 
     /* Spinners/Status */
     .stSpinner > div {{
-        border-top-color: #00ff00 !important;
+        border-top-color: var(--accent) !important;
+    }}
+
+    /* Color Picker */
+    input[type="color"] {{
+        border: var(--border);
+        border-radius: 0px;
+        height: 40px;
     }}
 
 </style>
