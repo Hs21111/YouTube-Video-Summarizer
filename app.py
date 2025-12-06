@@ -19,6 +19,108 @@ st.set_page_config(page_title="YouTube Summarizer & Chat", layout="wide")
 # Initialize DB
 database.init_db()
 
+# --- Neo-Brutalism CSS ---
+st.markdown("""
+<style>
+    /* Global Font & Colors */
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap');
+    
+    html, body, [class*="css"] {
+        font-family: 'Space Grotesk', sans-serif;
+        color: #000000;
+        background-color: #f0f0f0; 
+    }
+
+    /* Main Container */
+    .stApp {
+        background-color: #e0e7ff; /* Light indigo bg */
+    }
+
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        background-color: #ffde7d; /* Neo-brutalist Yellow */
+        border-right: 4px solid #000000;
+    }
+    [data-testid="stSidebar"] .stButton > button {
+        background-color: #ffffff;
+        color: #000000;
+        border: 3px solid #000000;
+        box-shadow: 4px 4px 0px 0px #000000;
+        transition: all 0.1s;
+        font-weight: bold;
+        width: 100%;
+    }
+    [data-testid="stSidebar"] .stButton > button:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0px 0px #000000;
+    }
+    [data-testid="stSidebar"] .stButton > button:active {
+        transform: translate(2px, 2px);
+        box-shadow: 2px 2px 0px 0px #000000;
+    }
+
+    /* Main Buttons (Suggested Questions) */
+    .stButton > button {
+        background-color: #a78bfa; /* Violet */
+        color: #000000;
+        border: 3px solid #000000;
+        box-shadow: 4px 4px 0px 0px #000000;
+        border-radius: 0px;
+        font-weight: bold;
+    }
+    .stButton > button:hover {
+        background-color: #c4b5fd;
+        border: 3px solid #000000;
+        box-shadow: 6px 6px 0px 0px #000000;
+        color: #000000;
+    }
+    
+    /* Inputs */
+    .stTextInput > div > div > input {
+        border: 3px solid #000000;
+        box-shadow: 4px 4px 0px 0px #000000;
+        border-radius: 0px;
+        color: #000000;
+        background-color: #ffffff;
+    }
+    .stChatInputContainer textarea {
+        border: 3px solid #000000 !important;
+        box-shadow: 4px 4px 0px 0px #000000 !important;
+        border-radius: 0px !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    /* Chat Messages */
+    .stChatMessage {
+        border: 3px solid #000000;
+        box-shadow: 5px 5px 0px 0px #000000;
+        border-radius: 0px;
+        padding: 10px;
+        background-color: #ffffff;
+        margin-bottom: 10px;
+    }
+    [data-testid="stChatMessageAvatarUser"] {
+        filter: drop-shadow(2px 2px 0px #000);
+        background-color: #feb2b2; /* Light Red */
+    }
+    [data-testid="stChatMessageAvatarAssistant"] {
+        filter: drop-shadow(2px 2px 0px #000);
+        background-color: #90cdf4; /* Light Blue */
+    }
+
+    /* Headings */
+    h1, h2, h3 {
+        text-transform: uppercase;
+        font-weight: 800;
+        text-shadow: 3px 3px 0px #fff;
+        -webkit-text-stroke: 1px black;
+    }
+
+</style>
+""", unsafe_allow_html=True)
+
+
 # --- Helpers ---
 def get_video_title(url):
     try:
