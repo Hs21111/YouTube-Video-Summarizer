@@ -65,7 +65,7 @@ st.markdown(f"""
     }}
     
     /* RESTORE ICON FONT */
-    [data-testid="stIconMaterial"] {{
+    [data-testid="stIconMaterial"] {
         font-family: 'Material Symbols Rounded' !important;
         font-weight: normal;
         font-style: normal;
@@ -77,15 +77,19 @@ st.markdown(f"""
         white-space: nowrap;
         word-wrap: normal;
         direction: ltr;
+        vertical-align: middle; /* Fix Vertical Alignment */
         -webkit-font-feature-settings: 'liga';
         -webkit-font-smoothing: antialiased;
-    }}
+    }
     
     /* Backgrounds */
     .stApp {{
         background-color: var(--bg);
         color: var(--text);
     }}
+
+    /* ... (Rest of CSS remains implicitly same via context match, usually we don't repeat unless needed, but for safety in this tool let's just target the python logic primarily and the CSS bit) */
+    /* NOTE: I will only replace the CSS block end and python logic for brevity and precision in this tool call if possible, but replace_file_content replaces the chunk. */
 
     /* Sidebar */
     [data-testid="stSidebar"] {{
@@ -253,16 +257,10 @@ def extract_suggestions(text):
             pass
     return suggestions
 
-def handle_response(user_text, db_id, system_instruction, llm):
+def generate_ai_response(db_id, system_instruction, llm):
     """
-    Handles generating the AI response, displaying it, and saving to DB.
+    Generates AI response based on current DB history, displays it, and saves it.
     """
-    # Display user message immediately (visual trick, though we rerun)
-    # st.chat_message("user").markdown(user_text) # Optional, sidebar/rerun handles state
-    
-    # Save user message
-    database.add_message(db_id, "user", user_text)
-    
     # Build Context
     messages = [SystemMessage(content=system_instruction)]
     current_history = database.get_chat_history(db_id)
@@ -370,12 +368,17 @@ Context Data:
 {transcript}
 """
 
+    # AUTO-RESUME CHECK
+    # If the last message was from the user, it means the generation was interrupted.
+    # We should retry generating the response immediately.
+    if history and history[-1][0] == "user":
+        generate_ai_response(db_id, system_instruction, llm)
+
     # If history is empty, auto-generate summary
     if not history:
         with st.spinner("Generating initial summary..."):
-            # We don't use handle_response regarding reruns here to avoid infinite loops easily, 
-            # but actually it's fine as long as we check history first.
-            handle_response("Please provide a short summary paragraph of the video content.", db_id, system_instruction, llm)
+            database.add_message(db_id, "user", "Please provide a short summary paragraph of the video content.")
+            generate_ai_response(db_id, system_instruction, llm)
 
     # Display History
     for role, content in history:
@@ -395,8 +398,10 @@ Context Data:
         cols = st.columns(len(last_suggestions))
         for idx, suggestion in enumerate(last_suggestions):
             if cols[idx].button(suggestion, key=f"sugg_{idx}"):
-                handle_response(suggestion, db_id, system_instruction, llm)
+                database.add_message(db_id, "user", suggestion)
+                generate_ai_response(db_id, system_instruction, llm)
 
     # Chat Input
     if prompt := st.chat_input("Ask a question about the video..."):
-        handle_response(prompt, db_id, system_instruction, llm)
+        database.add_message(db_id, "user", prompt)
+        generate_ai_response(db_id, system_instruction, llm)
