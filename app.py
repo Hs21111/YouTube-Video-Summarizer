@@ -67,27 +67,6 @@ st.markdown(f"""
     }}
 
     /* Spinners/Status */
-    .stSpinner > div {{
-        border-top-color: var(--accent) !important;
-    }}
-
-    /* Color Picker */
-    input[type="color"] {{
-        border: var(--border);
-        border-radius: 0px;
-        height: 40px;
-        box-shadow: 4px 4px 0px 0px var(--text);
-        cursor: pointer;
-    }}
-    input[type="color"]:hover {{
-        transform: translate(-2px, -2px);
-        box-shadow: 6px 6px 0px 0px var(--text);
-    }}
-
-</style>
-""", unsafe_allow_html=True)
-
-
 # --- Helpers ---
 def get_video_title(url):
     try:
