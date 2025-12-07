@@ -47,6 +47,151 @@ accent_color = st.sidebar.color_picker("Accent Color", "#00ff00") # Default Neon
 st.markdown(f"""
 <style>
     {font_face}
+    
+    :root {{
+        --accent: {accent_color};
+        --bg: #050505;
+        --card-bg: #101010;
+        --text: #ffffff;
+        --border: 3px solid #ffffff;
+        --shadow-size: 6px;
+        --hover-lift: -4px;
+        --hover-shadow: 10px;
+    }}
+
+    /* FORCE GLOBAL FONT (Except Icons) */
+    html, body, [class*="css"], font, span, div, p, h1, h2, h3, h4, h5, h6, input, textarea, button {{
+        font-family: 'JetBrainsMono', monospace !important;
+        font-size: 14px;
+    }}
+    
+    /* RESTORE ICON FONT */
+    [data-testid="stIconMaterial"] {{
+        font-family: 'Material Symbols Rounded' !important;
+        font-weight: normal;
+        font-style: normal;
+        font-size: 20px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        vertical-align: middle; 
+        -webkit-font-feature-settings: 'liga';
+        -webkit-font-smoothing: antialiased;
+    }}
+    
+    /* Backgrounds */
+    .stApp {{
+        background-color: var(--bg);
+        color: var(--text);
+    }}
+
+    /* Sidebar */
+    [data-testid="stSidebar"] {{
+        background-color: var(--card-bg);
+        border-right: var(--border);
+        padding-top: 20px;
+    }}
+    [data-testid="stSidebar"] * {{
+        color: var(--text) !important;
+        font-size: 13px;
+    }}
+    
+    /* Headings */
+    h1, h2, h3 {{
+        font-weight: 800;
+        color: var(--text);
+        text-transform: uppercase;
+        border-bottom: 4px solid var(--accent);
+        display: inline-block;
+        margin-bottom: 15px;
+        padding-bottom: 2px;
+        text-shadow: none !important;
+        font-size: 1.5rem !important;
+    }}
+    
+    /* Sidebar Buttons */
+    [data-testid="stSidebar"] .stButton > button {{
+        background-color: var(--bg);
+        color: var(--text);
+        border: var(--border);
+        box-shadow: var(--shadow-size) var(--shadow-size) 0px 0px var(--accent);
+        transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+        font-size: 12px;
+        height: auto;
+        padding: 0.4rem 0.8rem;
+    }}
+    [data-testid="stSidebar"] .stButton > button:hover {{
+        transform: translate(var(--hover-lift), var(--hover-lift));
+        box-shadow: var(--hover-shadow) var(--hover-shadow) 0px 0px var(--accent);
+        background-color: var(--accent);
+        color: #000000 !important; 
+        border: 2px solid var(--accent);
+    }}
+    [data-testid="stSidebar"] .stButton > button:active {{
+        transform: translate(0px, 0px);
+        box-shadow: 0px 0px 0px 0px var(--accent);
+    }}
+    
+    /* Input Fields */
+    .stTextInput > div > div > input {{
+        background-color: var(--card-bg);
+        color: var(--accent);
+        border: var(--border);
+        box-shadow: var(--shadow-size) var(--shadow-size) 0px 0px var(--text);
+        border-radius: 0px;
+        caret-color: var(--accent);
+        transition: all 0.2s;
+        font-size: 14px;
+        height: 40px;
+    }}
+    .stTextInput > div > div > input:focus {{
+        transform: translate(-1px, -1px);
+        box-shadow: 6px 6px 0px 0px var(--text);
+        outline: none;
+    }}
+
+    .stChatInputContainer textarea {{
+        background-color: var(--card-bg) !important;
+        color: var(--text) !important;
+        border: var(--border) !important;
+        box-shadow: var(--shadow-size) var(--shadow-size) 0px 0px var(--text) !important;
+        border-radius: 0px !important;
+        transition: all 0.2s;
+        font-size: 14px;
+        height: 45px !important;
+    }}
+    .stChatInputContainer textarea:focus {{
+        transform: translate(-1px, -1px);
+        box-shadow: 6px 6px 0px 0px var(--text) !important;
+    }}
+
+    /* Chat Messages */
+    .stChatMessage {{
+        background-color: var(--card-bg);
+        border: var(--border);
+        box-shadow: var(--shadow-size) var(--shadow-size) 0px 0px var(--accent);
+        border-radius: 0px;
+        margin-bottom: 12px;
+        padding: 10px;
+        transition: transform 0.2s;
+        font-size: 14px;
+    }}
+    .stChatMessage:hover {{
+        transform: translate(-1px, -1px);
+        box-shadow: 6px 6px 0px 0px var(--accent);
+    }}
+    
+    /* Suggestion Buttons */
+    .stButton > button {{
+        background-color: var(--bg);
         color: var(--accent);
         border: var(--border);
         box-shadow: var(--shadow-size) var(--shadow-size) 0px 0px var(--text);
@@ -66,7 +211,21 @@ st.markdown(f"""
         box-shadow: 0px 0px 0px 0px var(--accent);
     }}
 
-    /* Spinners/Status */
+    /* Color Picker */
+    input[type="color"] {{
+        border: var(--border);
+        border-radius: 0px;
+        height: 40px;
+        box-shadow: 4px 4px 0px 0px var(--text);
+        cursor: pointer;
+    }}
+    input[type="color"]:hover {{
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0px 0px var(--text);
+    }}
+
+</style>
+""", unsafe_allow_html=True)
 # --- Helpers ---
 def get_video_title(url):
     try:
