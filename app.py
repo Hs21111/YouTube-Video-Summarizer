@@ -60,12 +60,12 @@ st.markdown(f"""
     }}
 
     /* FORCE GLOBAL FONT (Except Icons) */
-    html, body, [class*="css"], font, span, div, p, h1, h2, h3, h4, h5, h6, input, textarea, button {
+    html, body, [class*="css"], font, span, div, p, h1, h2, h3, h4, h5, h6, input, textarea, button {{
         font-family: 'JetBrainsMono', monospace !important;
-    }
+    }}
     
     /* RESTORE ICON FONT */
-    [data-testid="stIconMaterial"] {
+    [data-testid="stIconMaterial"] {{
         font-family: 'Material Symbols Rounded' !important;
         font-weight: normal;
         font-style: normal;
@@ -79,7 +79,7 @@ st.markdown(f"""
         direction: ltr;
         -webkit-font-feature-settings: 'liga';
         -webkit-font-smoothing: antialiased;
-    }
+    }}
     
     /* Backgrounds */
     .stApp {{
