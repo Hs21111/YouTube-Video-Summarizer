@@ -28,7 +28,7 @@ def get_img_as_base64(file):
 
 # Try to load local font, else fallback
 try:
-    font_b64 = get_img_as_base64("JetBrainsMono-Regular.woff2")
+    font_b64 = get_img_as_base64("JetBrainsMonoNerdFont-Regular.woff2")
     font_face = f"""
     @font-face {{
         font-family: 'JetBrainsMono';
