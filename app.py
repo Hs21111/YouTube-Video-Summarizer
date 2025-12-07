@@ -59,10 +59,27 @@ st.markdown(f"""
         --hover-shadow: 12px;
     }}
 
-    /* FORCE GLOBAL FONT */
-    html, body, [class*="css"], font, span, div, p, h1, h2, h3, h4, h5, h6, input, textarea, button {{
+    /* FORCE GLOBAL FONT (Except Icons) */
+    html, body, [class*="css"], font, span, div, p, h1, h2, h3, h4, h5, h6, input, textarea, button {
         font-family: 'JetBrainsMono', monospace !important;
-    }}
+    }
+    
+    /* RESTORE ICON FONT */
+    [data-testid="stIconMaterial"] {
+        font-family: 'Material Symbols Rounded' !important;
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px; /* Optional adjustment */
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        -webkit-font-feature-settings: 'liga';
+        -webkit-font-smoothing: antialiased;
+    }
     
     /* Backgrounds */
     .stApp {{
