@@ -13,7 +13,7 @@ from rich.prompt import Prompt
 load_dotenv()
 
 # Set model
-MODEL_NAME = "gemini-2.5-pro" # Verified available via API
+MODEL_NAME = "gemini-2.5-flash" # Verified available via API
 
 console = Console()
 
