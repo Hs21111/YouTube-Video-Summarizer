@@ -65,7 +65,8 @@ st.markdown(f"""
     }}
     
     /* RESTORE ICON FONT */
-    [data-testid="stIconMaterial"] {
+    /* RESTORE ICON FONT */
+    [data-testid="stIconMaterial"] {{
         font-family: 'Material Symbols Rounded' !important;
         font-weight: normal;
         font-style: normal;
@@ -80,7 +81,7 @@ st.markdown(f"""
         vertical-align: middle; /* Fix Vertical Alignment */
         -webkit-font-feature-settings: 'liga';
         -webkit-font-smoothing: antialiased;
-    }
+    }}
     
     /* Backgrounds */
     .stApp {{
