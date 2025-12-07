@@ -195,7 +195,7 @@ else:
         st.error("API Key not configured.")
         st.stop()
 
-    system_instruction = f"""
+    system_instruction = f'''
 You are a helpful assistant.
 Your goal is to answer questions based on the video content provided below.
 CRITICAL INSTRUCTION: Do NOT mention "the transcript", "the text", or "according to the video" in your responses. 
@@ -210,7 +210,7 @@ Format the suggestions clearly at the end of your response like this:
 
 Context Data:
 {transcript}
-"""
+'''
 
     # AUTO-RESUME CHECK
     # If the last message was from the user, it means the generation was interrupted.
